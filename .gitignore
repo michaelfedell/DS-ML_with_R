@@ -1,0 +1,6 @@
+.DS_Store
+.RData
+.Rhistory
+*.html
+.ipynb*/
+R-Course-HTML-Notes/

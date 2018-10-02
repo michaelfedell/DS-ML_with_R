@@ -1,0 +1,60 @@
+---
+title: "Section 10 - Lists"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 10 - Lists
+
+```{r}
+v <- c(1,2,3)
+m <- matrix(1:10, nrow=2)
+df <- mtcars
+class(v)
+class(m)
+class(df)
+```
+
+
+## Combine variables of different types into a single list
+```{r}
+my.list <- list(v,m,df)
+my.list
+```
+
+
+```{r}
+my.named.list <- list(sample.vec = v, sample.matrix = m, sample.df = df)
+my.named.list
+```
+
+```{r}
+my.named.list$sample.matrix
+```
+
+
+
+```{r}
+my.list[1]
+
+my.named.list[1]
+
+my.named.list["sample.vec"]
+
+class(my.named.list["sample.vec"]) # Important to note that bracket notation returns list
+class(my.named.list$sample.vec) # $ selector returns the actual object with its type
+class(my.named.list[["sample.vec"]]) # Same for double bracket
+```
+
+
+
+### Combine lists
+```{r}
+double.list <- c(my.named.list, my.named.list)
+str(my.named.list)
+str(double.list)
+```
+

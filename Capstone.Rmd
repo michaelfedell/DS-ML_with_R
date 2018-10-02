@@ -1,0 +1,59 @@
+---
+title: "Capstone"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+R.options=list(max.print=25)
+```
+
+## Capstone Project
+
+```{r}
+batting <- fread('Capstone Project/Batting.csv')
+head(batting)
+str(batting)
+```
+
+
+```{r}
+head(batting$AB)
+head(batting$`2B`)
+```
+
+
+### Feature engineering  
+####Batting Average (BA):  
+```{r}
+batting$BA <- batting$H / batting$AB
+tail(batting$BA, 5)
+```
+
+#### On Base Percentage (OBP):  
+```{r}
+batting$OBP <- (batting$H + batting$BB + batting$HBP) / (batting$AB + batting$BB + batting$HBP + batting$SF)
+tail(batting$OBP)
+```
+
+#### Slugging Percentage (SP):  
+```{r}
+batting$SLG <- ((batting$H - batting$`2B` - batting$`3B` - batting$HR) + 2 * batting$`2B` + 3 * batting$`3B` + 4 * batting$HR) / batting$AB
+tail(batting$SLG)
+```
+
+```{r}
+str(batting)
+```
+
+
+### Load in salaries CSV
+
+
+
+
+
+
+
+
+

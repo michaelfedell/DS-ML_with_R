@@ -1,0 +1,101 @@
+---
+title: "Section 11 - I/O with R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 11 - I/O with R
+### Navigation
+getwd() => output the current working directory
+setwd() => change the current working directory (can be absolute or relative path)
+
+### CSV
+`write.csv('filename.csv')`
+
+`read.csv('path/to/file.csv')`
+
+
+## Excel
+### Reading Files
+We will need a new package for this
+
+`install.packages('readxl')`  
+`library(readxl)`
+
+List sheets in excel file  
+`excel_sheets('filename.xlsx')`
+
+Read in an excel file:  
+`df <- read_excel('filename.xlsx', sheet = 'SheetName')`
+
+`entire.workbook <- lapply(excel_sheets('filename.xlsx'), read_excel, path='filename.xlsx')`
+
+
+### Writing to Excel Files
+Need yet another package  
+`install.packages('xlsx')`  
+`library(xlsx)`
+
+`write.xlsx(dataframe, 'output_filename.xlsx')`
+
+
+## SQL
+### RODBC - General Use
+The RODBC library is one way of connecting to databases. Regardless of what you decide to use, I highly recommend a google search consisting of your database of choice + R. Here's an example use of RODBC
+```
+install.packages("RODBC") 
+# RODBC Example of syntax
+library(RODBC)
+
+myconn <-odbcConnect("Database_Name", uid="User_ID", pwd="password")
+dat <- sqlFetch(myconn, "Table_Name")
+querydat <- sqlQuery(myconn, "SELECT * FROM table")
+close(myconn)
+```
+
+Google for example 'R + PostgreSQL'  
+Can use the CRAN page (usually first result)  
+PDF will contain full documentation for the driver
+
+Then need to install the package specified on CRAN page  
+e.g. `install.packages('RPostgreSQL')`  
+`library(RPostgreSQL)`
+
+r-bloggers is a great place for tips, tutorials, and examples
+
+
+## Web Scraping with R
+[Import.io](import.io) can be used for auutomatic url-to-csv web scarping  
+
+For more fine-tuned control, we will use the rvest package
+
+`install.packages('rvest')`  
+`library(rvest)`  
+`demo(package = 'rvest')`  
+`demo(package = 'rvest', topic = 'tripadvisor')`  
+
+Another demo can be found in the course notes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

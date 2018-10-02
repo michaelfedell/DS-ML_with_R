@@ -1,0 +1,202 @@
+---
+title: "Section 13 - Advanced Programming in R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 13 - Advanced Programming in R
+
+## Built-In Functions
+`seq()` will generate a sequence of continuous numbers starting at `start`, ending at `end` inclusive and moving `by` places at a time.  
+e.g. `seq(0, 10, by = 2)` will print `[  0  2  4  6  8  10  ]`
+
+`sort()` will sort the values in a vector.  
+```
+v <- c(1, 4, 7, 2, 13, 3, 11)
+sort(v)
+
+[  1  2  3  4  7  11  13  ]
+```
+
+you can also sort descending with `sort(v, decreasing = TRUE)`  
+sorting also works with alpha values case insensitive
+
+
+`rev(v)` will reverse the order of a vector
+
+`str(df)` and `summary(df)` give stats on dataframes
+
+`append(v1, v2)` will attach the values of v2 onto the end of v1 (not sure how this is different from `c(v1, v2)`)
+
+Data type can be checked with the `is.datatype()` function. e.g.  
+```
+v <- c(1,2,3)
+is.vector(v) => TRUE
+is.data.frame(v) => FALSE
+```
+
+Data types can be converted (if compatible) using the `as.datatype()` function. e.g.  
+```
+v <- c(1,2,3)
+as.list(v) => List representation of v:
+[[1]]
+[1]  1
+
+[[2]]
+[1]  2
+
+[[3]]
+[1]  3
+```
+
+## Apply
+The apply function will apply a passed function to elements of an itterable (like a vector or list)
+
+`sample(x = range, n)` will return `n` random samples within the given `range` e.g.  
+`sample(x = 1:100, 3)` might return `[  77  13  92  ]`
+
+```
+v <- c(1,2,3,4,5)
+addrand <- function(x) {
+  ran <- sample(1:100, 1)
+  return (x + ran)
+}
+lapply(v, addrand)
+```
+lapply will return a list (could look like:)  
+```
+[[1]]
+[1]  12
+
+[[2]]
+[1]  79
+
+[[3]]
+[1]  64
+
+[[4]]
+[1]  8
+
+[[5]]
+[1]  92
+```
+
+for a more simple result, `sapply()` can be used to return a vector result e.g.  
+```
+sapply(v)
+[1]  33 101 71 27 85
+```
+
+One more example:
+```
+v <- 1:5
+
+times2 <- function(num) {
+  return(num * 2)
+}
+print(v)
+result <- sapply(v, times2)
+print(result)
+```
+Will print:  
+```
+[1]  1 2 3 4 5
+[1]  2 4 6 8 10
+```
+
+`help(sapply)` can show other variants of apply function
+
+
+## Anonymous Functions
+```
+v <- 1:5
+print(sapply(v, function(num){num * 2}))
+```
+Will acheive the same result as  
+```
+v <- 1:5
+dub <- function(num) {
+ return(num * 2)
+}
+
+print(sapply(v, dub))
+```
+
+### Using apply with multiple inputs
+suppose a function has been defined with 2 or more inputs like  
+```
+v <- 1:5
+add.num <- function(x, num) {
+  return(x + num)
+}
+print(sapply(v, add.num))
+```
+Will yield an error. Apply will pass the itterator's element to the first argument, but any additional non-optional arguments must be specified like so:  
+```
+print(sapply(v, add.num, num = 5))
+```
+
+## Math Functions
+`abs(x)` returns the absolute value of x  
+`sum(v)` returns sum of vector  
+`round(x, n)` rounds x to n digits
+
+More functions [referenced here](https://cran.r-project.org/doc/contrib/Short-refcard.pdf)
+
+
+## Regex
+`grepl(r)` returns a logical  
+`grep(r)` returns an index  
+
+```{r}
+text <- "Hi there, do you know who you are voting for?"
+text
+grepl('voting', text)
+grepl('dog', text)
+```
+
+```{r}
+v <- c("a", "b", "c", "d", "d")
+v
+grepl("b", v)
+
+grep("d", v)
+grep("e", v)
+```
+
+
+## Date and Timestamps
+```{r}
+today <- Sys.Date()
+today
+class(today)
+
+c <- "1990-01-01"
+c
+class(c)
+my.date <- as.Date(c)
+my.date
+class(my.date)
+
+# as.Date("Nov-03-1990")
+parsed.date <- as.Date("Nov-03-1990", format = "%b-%d-%y")
+parsed.date
+```
+
+Date codes for defining format:  
+`help(strptime)`
+
+
+Times use the POSIXct type  
+```{r}
+as.POSIXct("11:02:03", format = "%H:%M:%S")
+```
+
+But more common, the `strptime()` function will be used  
+```{r}
+strptime("11:02:03", format="%H:%M:%S")
+```
+

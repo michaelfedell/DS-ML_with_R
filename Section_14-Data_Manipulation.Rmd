@@ -1,0 +1,205 @@
+---
+title: "Section 14 - Data Manipulation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 14 - Data Manipulation
+```{r}
+# install.packages('dplyr')
+# install.packages('nycflights13')
+
+library(dplyr)
+library(nycflights13)
+```
+
+## DPLYR
+
+- filter will perform a simple subset on a dataframe, accepting as many filters as you need to pass as additional arguments
+- slice will return a 'slice' of rows from a dataframe
+- arrange will reorder rows in a dataframe based on a specified column (mult columns can be specified)
+- select will just return the specified columns of dataframe
+- rename allows easy renaming of columns in dataframe (`rename(df, new.name = old.name)`)
+- select will return all the unique values in a column
+- mutate will add a new column that can be built using function of existing functions (returns entire dataframe)
+- transmute will return only the new column created
+- summarise will aggregate the data in a dataframe using some function like mean
+- sample_n will return a random n number of rows from dataframe
+- sample_frac will return a portion of rows from the dataframe
+```{r}
+head(flights)
+head(filter(flights, month==11, day==3, carrier=="AA"))
+slice(flights, 1:10)
+head(arrange(flights, year, month, day, desc(arr_time)))
+head(select(flights, carrier, arr_delay))
+head(rename(flights, airline_carrier = carrier))
+distinct(select(flights, carrier))
+head(mutate(flights, new_col = arr_delay - dep_delay))
+summarise(flights, avg_air_time=mean(air_time, na.rm = TRUE))
+sample_n(flights, 10)
+```
+
+
+## The Pipe Operator
+```{r}
+df <- mtcars
+result <- arrange(sample_n(filter(df, mpg>20), size=5), desc(mpg))
+print(result)
+```
+
+Above code is hard to read due to extensive nesting
+
+```{r}
+a <- filter(df, mpg>20)
+b <- sample_n(a, size=5)
+result <- arrange(b, desc(mpg))
+print(result)
+```
+
+This code is not great either with so many unnecessary variable assignments
+
+```{r}
+result <- df %>% filter(mpg>20) %>% sample_n(size=5) %>% arrange(desc(mpg)) 
+print(result)
+```
+
+^ Nice clean andefficient code using pipe operator
+
+## TIDYR
+```{r}
+# install.packages('tidyr')
+# install.packages('data.table')
+```
+
+```{r}
+library(tidyr)
+library(data.table)
+
+comp <- c(1,1,1,2,2,2,3,3,3)
+yr <- c(1998,1999,2000,1998,1999,2000,1998,1999,2000)
+q1 <- c(runif(9, min=0, max=100))
+q2 <- c(runif(9, min=0, max=100))
+q3 <- c(runif(9, min=0, max=100))
+q4 <- c(runif(9, min=0, max=100))
+
+df <- data.frame(comp=comp, year=yr, Qtr1=q1, Qtr2=q2, Qtr3=q3, Qtr4=q4)
+df
+```
+
+
+### gather(data, key, value, columns_to_gater)  
+This function will take "wide" dataframes and condense several columns into one.  
+In this example, Qtr1, Qtr2, etc. are not actually variables, but instead just different
+values that the "Quarter" variable might take on. Therefore, these columns should be
+condensed into a single "Quarter" column
+ 
+> Well-formatted tables will have a single row for each observation and a single row for each variable. Every column should reveal something new about that particular observation.
+ 
+```{r}
+gather(df, Quarter, Revenue, Qtr1:Qtr4)
+```
+ 
+```{r}
+stocks <- data.frame(
+  time = as.Date('2009-01-01') + 0:9,
+  x = rnorm(10,0,1),
+  y = rnorm(10,0,2),
+  z = rnorm(10,0,4)
+)
+head(stocks)
+```
+
+```{r}
+stocks.gathered <- stocks %>% gather(stock, price, x, y, z)
+head(stocks.gathered)
+```
+
+But what if we want to spread that data back out?
+
+### spread()
+
+```{r}
+stocks.gathered %>% spread(stock, price)
+```
+
+But notice that this is really not well-formatted or "tidy" data
+
+
+### separate(data, col, into, sep)  
+This function will split out combined data based on `sep` in a column (`col`) into several columns identified in `into` argument
+```{r}
+df <- data.frame(new.col=c(NA, "a.x", "b.y", "c.z"))
+df
+```
+
+```{r}
+separate(df, new.col, c('ABC', 'XYZ'))
+```
+
+```{r}
+df <- data.frame(new.col=c(NA, "a-x", "b-y", "c-z"))
+df
+```
+```{r}
+separate(data=df, col=new.col, into=c("abc", "xyz"), sep='-')
+```
+
+But of course there is a reverse of this as well...
+
+### unite(data, new.col, [list,of,cols], sep)  
+This will unite data from several columns joined by `sep` in `list,of,cols` into a single column named `new.col`
+
+```{r}
+df.sep <- separate(data=df, col=new.col, into=c("abc", "xyz"), sep='-')
+df.sep
+
+unite(df.sep, new.joined.col, abc, xyz)
+```
+
+
+
+
+## DPLYR Exercises:
+
+### Return rows of cars that have an mpg value greater than 20 and 6 cylinders.
+```{r}
+filter(mtcars, mpg>20, cyl==6)
+```
+
+### Reorder the Data Frame by cyl first, then by descending wt.
+
+```{r}
+arrange(mtcars, cyl, desc(wt))
+```
+
+### Select the columns mpg and hp
+```{r}
+select(mtcars, mpg, hp)
+```
+
+### Select the distinct values of the gear column.
+```{r}
+distinct(select(mtcars, gear))
+```
+
+### Create a new column called "Performance" which is calculated by hp divided by wt.
+```{r}
+mutate(mtcars, Performance = hp / wt)
+```
+
+### Find the mean mpg value using dplyr.
+```{r}
+summarise(mtcars, avg_mg = mean(mpg))
+```
+
+### Use pipe operators to get the mean hp value for cars with 6 cylinders.
+```{r}
+mtcars %>% filter(cyl == 6) %>% summarise(avg_hp = mean(hp))
+```
+
+
+
+

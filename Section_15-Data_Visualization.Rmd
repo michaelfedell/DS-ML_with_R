@@ -1,0 +1,256 @@
+---
+title: "Section 15 - Data Visualization"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 15 - Data Visualization
+
+## Layers  
+The principles of data visualization are built on the concept of layers.
+Traditionally, every data visualization is made up of three core layers  
+- **Data** (the underlying numerical data)  
+- **Aesthetics** (the chart decoration such as gridlines, labels, etc)  
+- **Geometries** (the physical manifestation of the data such as points on graph, lines, etc)  
+```{r}
+library(ggplot2)
+```
+```{r}
+pl <- ggplot(data=mtcars, # <-- Data Layer
+             aes(x=mpg, y=hp)) # <-- Aesthetics Layer
+```
+```{r}
+pl + geom_point() # <-- Geometries Layer
+```
+
+The next three layers add additional information to make visualizations more understandable.  
+- **Facets**  
+- **Statistics**  
+- **Coordinates**  
+```{r}
+pl + geom_point() + facet_grid(cyl ~.) # <-- Facets Layer
+```
+
+```{r}
+pl + geom_point() + facet_grid(cyl ~.) +
+  stat_smooth() # <-- Statistics Layer
+```
+
+```{r}
+pl + geom_point() + facet_grid(cyl ~.) + stat_smooth() + 
+  coord_cartesian(xlim=c(15,25)) # <-- Coordinates Layer
+```
+
+
+The 7th and final layer is added for tweaking visual appearance  
+- **Theme** (font size, colors, background, etc)  
+
+```{r}
+pl + geom_point() + facet_grid(cyl ~.) + stat_smooth() + coord_cartesian(xlim=c(15,25)) +
+  theme_bw() # <-- Theme Layer
+```
+
+```{r}
+library(ggplot2movies)
+```
+
+### [R Studio Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+
+### Histograms
+
+```{r}
+colnames(movies)
+data <- ggplot(movies, aes(x=rating)) # Data Layer
+geometry <- data + 
+  geom_histogram(binwidth = 0.1, color='red', fill='pink', alpha=0.4) # Geometry Layer
+aesthetics <- geometry + xlab('Movie Rating') + ylab('Count') # Aesthetics Layer
+titled <- aesthetics + ggtitle('Movie Ratings')
+titled
+altfill <- data + geom_histogram(binwidth = 0.1, aes(fill=..count..))
+altfill
+```
+
+### Scatterplot
+
+```{r}
+df <- mtcars
+pl <- ggplot(df, aes(x=wt, y=mpg))
+pl + geom_point(size=5, alpha=0.7)
+pl + geom_point(aes(size=hp), color='red')
+pl + geom_point(size=5, alpha=0.7, aes(shape=factor(cyl), color=factor(cyl)))
+```
+
+
+```{r}
+pl + geom_point(aes(color=hp), size=5) + scale_color_gradient(low='green', high='red')
+```
+
+
+### Barplot
+
+```{r}
+df <- mpg
+head(mpg)
+pl <- ggplot(df, aes(x=class))
+pl + geom_bar(aes(fill=drv))
+```
+
+```{r}
+pl + geom_bar(aes(fill=drv), position='dodge')
+pl + geom_bar(aes(fill=drv), position='fill')
+```
+
+
+### Boxplots
+
+```{r}
+df <- mtcars
+head(df)
+
+pl <- ggplot(df, aes(x=cyl, y=mpg))
+pl + geom_boxplot() # ERROR
+pl <- ggplot(df, aes(x=factor(cyl), y=mpg))
+pl + geom_boxplot()
+```
+
+Box plots are already very information dense so best not to add too many layers to them  
+
+```{r}
+pl + geom_boxplot(aes(fill=factor(cyl))) + theme_bw()
+```
+
+
+### 2-Variable Plots
+```{r}
+pl <- ggplot(movies, aes(x=year, y=rating))
+pl + geom_bin2d() + scale_fill_gradient(high='red', low='navy')
+```
+
+
+```{r}
+pl + geom_hex()
+```
+
+```{r}
+```
+```{r}
+pl + geom_hex()
+```
+
+```{r}
+pl + geom_density2d()
+```
+
+
+### Coordinates and Faceting
+```{r}
+pl <- ggplot(mpg, aes(x=displ, y=hwy)) + geom_point()
+pl
+pl + coord_cartesian(xlim=c(1, 4), ylim=c(15,30))
+pl + coord_fixed(ratio = 1/3)
+```
+
+```{r}
+help("facet_grid")
+
+pl + facet_grid(. ~ cyl)
+pl + facet_grid(cyl ~ drv)
+```
+
+
+### Themes
+```{r}
+pl <- ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point()
+pl
+```
+
+```{r}
+theme_set(theme_minimal()) # sets default theme for all plots
+pl
+```
+
+```{r}
+pl + theme_dark()
+```
+
+More themes!!!
+```{r}
+library(ggthemes)
+```
+
+
+```{r}
+pl + theme_economist()
+```
+
+
+
+
+## Exercises
+
+### Histogram of hwy mpg values:  
+```{r}
+ggplot(mpg, aes(x=hwy)) + geom_histogram(fill='red', alpha=0.5)
+```
+
+### Barplot of car counts per manufacturer with color fill defined by cyl count
+
+```{r}
+ggplot(mpg, aes(x=manufacturer)) + geom_bar(aes(fill=factor(cyl)))
+```
+
+### Switch now to use the txhousing dataset that comes with ggplot2
+
+###Create a scatterplot of volume versus sales. Afterwards play around with alpha and color arguments to clarify information.
+
+```{r}
+ggplot(txhousing, aes(x=sales, y=volume)) + 
+  geom_point(color='blue', fill='blue', alpha=0.5)
+```
+
+
+### Add a smooth fit line to the scatterplot from above. Hint: You may need to look up geom_smooth()
+
+```{r}
+ggplot(txhousing, aes(x=sales, y=volume)) + 
+  geom_point(color='blue', fill='blue', alpha=0.5) +
+  geom_smooth(color='red')
+```
+
+
+## Plotly Visualizations!
+
+### [Getting Started with Plotly in R](https://plot.ly/R/getting-started)
+
+Find more docs [here](https://plot.ly/ggplot2/)
+
+```{r}
+library(plotly)
+```
+
+
+```{r}
+pl <- ggplot(mtcars, aes(mpg, wt)) + geom_point()
+pl
+```
+
+
+```{r}
+gpl <- ggplotly(pl)
+gpl
+```
+
+
+
+
+
+
+
+
+
+
+
+
